@@ -1,0 +1,9 @@
+*.pyc
+.#*
+*.mo
+*.pyo
+*.py#
+*po~
+*INFO#
+test.py
+test.db
