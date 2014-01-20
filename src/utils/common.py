@@ -18,7 +18,7 @@ except ImportError:
     
 from utils.six.moves import xrange
     
-def parser_json(raw):
+def parse_json(raw):
     try:
         data = json.loads(raw)
     except:    

@@ -4,11 +4,11 @@ import QtQuick.Controls.Styles 1.0
 
 ScrollView {
     id: root
-    
     frameVisible: false
+    property int rightMargin
     Component.onCompleted: {
         viewport.anchors.rightMargin = 0
-        __scroller.rightMargin = -3
+        __scroller.rightMargin = -3 + rightMargin
         flickableItem.interactive = true
     }
 

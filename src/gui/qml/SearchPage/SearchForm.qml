@@ -4,8 +4,9 @@ import "../Widgets" as Widgets
 
 Column {
     id: root
-    spacing: 10
-    signal clicked
+    spacing: 12
+    signal grabClicked
+    signal queryClicked
     
     Row {
         spacing: 20
@@ -102,13 +103,28 @@ Column {
         z: 600        
     }
 
-    Widgets.Button {
-        text: "开始抢票"
-        width: 250; height: 36
-        onClicked: {
-            if (fromStation.telecode != "" && toStation.telecode != "" && calendar.text) {
-                root.clicked()
-                Poster.grabQueryTickets(fromStation.telecode, toStation.telecode, calendar.text)
+    Row {
+        spacing: 50
+        
+        Widgets.Button {
+            text: "查询票数"
+            width: 100; height: 36
+            normalColor: "#fc9416"
+            pressColor: "#e88002"
+            onClicked: {
+                queryClicked()                
+                Poster.queryTrainModel().queryTrains(fromStation.telecode, toStation.telecode, calendar.text)
+            }
+        }
+        
+        Widgets.Button {
+            text: "开始抢票"
+            width:100 ; height: 36
+            onClicked: {
+                if (fromStation.telecode != "" && toStation.telecode != "" && calendar.text) {
+                    grabClicked()        
+                    Poster.grabQueryTickets(fromStation.telecode, toStation.telecode, calendar.text)
+                }
             }
         }
     }

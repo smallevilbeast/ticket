@@ -75,7 +75,6 @@ Item {
         visible: codeVisible
         onCloseClicked: {
             codeVisible = false
-            enableLogin()
         }
         onPasscodeUpdated: {
             codeVisible = true

@@ -5,9 +5,11 @@ TextField {
     readOnly: true    
     property bool clickFlag: false
     radius: 0
-    signal calendarClicked(string date)
+    signal calendarChanged(string date)
+    signal calendarClicked(var date)
     
     Component.onCompleted: {
+        windowView.calendarChanged.connect(calendarChanged)
         windowView.calendarClicked.connect(calendarClicked)
         text = windowView.today()
     }
@@ -22,10 +24,8 @@ TextField {
         cursorShape: Qt.PointingHandCursor
     }
     
-    onCalendarClicked: {
-        if (clickFlag) {
-            text = date
-            clickFlag = false
-        }
+    onCalendarChanged: {
+        text = date
+        clickFlag = false
     }
 }

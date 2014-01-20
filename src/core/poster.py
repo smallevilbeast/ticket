@@ -94,7 +94,7 @@ class Poster(object):
     @common.threaded    
     def login(self, rand_code):    
         data = {"loginUserDTO.user_name": self._username, "userDTO.password" : self._passwd, "randCode" : rand_code}
-        ret = self._session.post("https://kyfw.12306.cn/otn/login/loginAysnSuggest", data=data).json()
+        ret = common.parse_json(self._session.post("https://kyfw.12306.cn/otn/login/loginAysnSuggest", data=data).text)
         login_check = ret.get("data", {}).get("loginCheck", "N")
         if login_check == "Y":
             logger.info("-- account {0} login success [requests]".format(self._username))
@@ -124,18 +124,18 @@ class Poster(object):
     @common.threaded    
     def check_passcode(self, rand_code, module, rand="sjrand"):
         data = dict(randCode=rand_code, rand=rand)
-        ret = self._session.post("https://kyfw.12306.cn/otn/passcodeNew/checkRandCodeAnsyn", data=data).json()
+        ret = common.parse_json(self._session.post("https://kyfw.12306.cn/otn/passcodeNew/checkRandCodeAnsyn", data=data).text)
         if ret.get("data", "N") == "Y":
             signals.passcode_checked.send(sender=self, module=module, value=True)
         else:    
-            self.new_passcode()
+            self.new_passcode(module=module, rand=rand)
             
     def order_passcode(self):        
         self.new_passcode(module="passenger", rand="randp")
     
     @common.threaded    
     def request_passengers(self):
-        ret = self._session.post("https://kyfw.12306.cn/otn/confirmPassenger/getPassengerDTOs").json()
+        ret = common.parse_json(self._session.post("https://kyfw.12306.cn/otn/confirmPassenger/getPassengerDTOs").text)
         status = ret.get("status", False)
         if status:
             passengers = ret.get("data", {}).get("normal_passengers", [])
@@ -146,7 +146,7 @@ class Poster(object):
     @property    
     def user_logined(self):    
         data = {"_json_att" : ""}
-        ret = self._session.post("https://kyfw.12306.cn/otn/login/checkUser", data=data).json()
+        ret = common.parse_json(self._session.post("https://kyfw.12306.cn/otn/login/checkUser", data=data).text)
         return ret.get("data", {}).get("flag", False)
     
     def get_station_names(self):
@@ -169,7 +169,7 @@ class Poster(object):
         _data['to_station'] = to_station
         
         url = "https://kyfw.12306.cn/otn/lcxxcx/query"
-        ret = self._session.get(url, params=_data).json()
+        ret = common.parse_json(self._session.get(url, params=_data).text)
         if ret == -1:
             signals.error_excepted.send(sender=self, type_="query", info="查询错误, 请重试")
             return 
@@ -196,7 +196,7 @@ class Poster(object):
         data['leftTicketDTO.from_station'] = from_station
         data['leftTicketDTO.to_station'] = to_station
         data['purpose_codes'] = "ADULT"
-        ret = self._session.get(url, params=data).json()
+        ret = common.parse_json(self._session.get(url, params=data).text)
         if ret == -1:
             signals.error_excepted.send(sender=self, type_="query", info="查询错误, 请重试")
             return 
@@ -303,7 +303,7 @@ class Poster(object):
         data['query_from_station_name'] = train.fromStationName
         data['query_to_station_name'] = train.toStationName
         data['undefined'] = ""
-        ret = self._session.post(url, data=data).json()
+        ret = common.parse_json(self._session.post(url, data=data).text)
         status = ret.get("status", False)
         if not status:
             messages = "提交订单请求失败: {0}".format("".join(ret.get("messages", [])))
@@ -332,11 +332,14 @@ class Poster(object):
         data['randCode'] = self._order_infos['randCode']
         data['_json_att'] = ""
         data['REPEAT_SUBMIT_TOKEN'] = self._order_infos["REPEAT_SUBMIT_TOKEN"]
-        ret = self._session.post(url, data=data).json()
-        submit_status = ret.get('data', {}).get("submitStatus", False)
+        ret = common.parse_json(self._session.post(url, data=data).text)
+        ret_data = ret.get('data', {})
+        submit_status = ret_data.get("submitStatus", False)
         if not submit_status:
-            message = "检测订单信息: " + "".join(ret.get("messages", []))
-            signals.error_excepted.send(sender=self, type_="order", info=message)
+            err_msg = ret_data.get("errMsg", None)
+            if not err_msg:
+                err_msg = "检测订单信息: " + "".join(ret.get("messages", []))
+            signals.error_excepted.send(sender=self, type_="order", info=err_msg)
         return submit_status
         
     def get_quque_count(self):    
@@ -353,7 +356,7 @@ class Poster(object):
         data['purpose_codes'] = "00"
         data['_json_att'] = ""
         data['REPEAT_SUBMIT_TOKEN'] = self._order_infos['REPEAT_SUBMIT_TOKEN']
-        ret = self._session.post(url, data=data).json()
+        ret = common.parse_json(self._session.post(url, data=data).text)
         status = ret.get("status", False)
         if not status:
             signals.error_excepted.send(sender=self, type_="order", info="".join(ret.get("messages", [])))
@@ -377,7 +380,7 @@ class Poster(object):
         data['leftTicketStr'] = self._order_infos['leftTicketStr']
         data['train_location'] = self._order_infos["train"].locationCode
         data['REPEAT_SUBMIT_TOKEN'] = self._order_infos["REPEAT_SUBMIT_TOKEN"]
-        ret = self._session.post(url, data=data).json()
+        ret = common.parse_json(self._session.post(url, data=data).text)
         submit_status = ret.get('data', {}).get("submitStatus", False)
         if not submit_status:
             signals.error_excepted.send(sender=self, type_="order", info="确认订单失败: " + "".join(ret.get("messages", [])))

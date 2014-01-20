@@ -6,7 +6,9 @@ from __future__ import unicode_literals
 from PyQt5 import QtCore
 import peewee as pw
 from utils import six
+from datetime import datetime
 from gui.qobject import QObjectListModel, ObjectWrapper, postGui
+from gui import signals as guiSignals
 from core.signals import query_trains_completed, query_tickets_completed
 from core.poster import SEAT_TYPE, JSON_SEAT, poster
 from db import signals as dbSignals
@@ -59,7 +61,10 @@ class TrainModel(BaseModel):
         if connectSignals:
             query_trains_completed.connect(self.onQueryTrainsCompleted, sender=self)
             query_tickets_completed.connect(self.onQueryTicketsCompleted, sender=self)
-
+            
+        now = datetime.now()
+        self._today = QtCore.QDate(now.year, now.month, now.day)        
+        self._dateObj = QtCore.QDate(now.year, now.month, now.day)        
         
     @classmethod    
     def parseQuery(cls, queryItem):    
@@ -155,6 +160,10 @@ class TrainModel(BaseModel):
             
     @QtCore.pyqtSlot(str, str, str)    
     def queryTrains(self, fromStation, toStation, date):
+        self._fromStation = fromStation
+        self._toStation = toStation
+        self._date = date
+        self._dateObj = QtCore.QDate(*list(map(int, date.split("-"))))
         poster.query_tickets(fromStation, toStation, date, sender=self)
         
     @QtCore.pyqtSlot(str)    
@@ -166,6 +175,32 @@ class TrainModel(BaseModel):
                 break
         self.remove(obj)    
         
+    def queryByDay(self, date):    
+        guiSignals.calendar_date_changed.send(sender=self, date=self._dateObj)
+        try:
+            poster.query_tickets(self._fromStation, self._toStation, date, sender=self)
+        except:    
+            pass
+        
+    @QtCore.pyqtSlot()    
+    def previousDay(self):    
+        if self._dateObj <= self._today:
+            return        
+        self._dateObj = self._dateObj.addDays(-1)
+        date = self._dateObj.toString("yyyy-MM-dd")
+        self.queryByDay(date)
+    
+    @QtCore.pyqtSlot()
+    def nextDay(self):
+        self._dateObj = self._dateObj.addDays(1)
+        date = self._dateObj.toString("yyyy-MM-dd")
+        self.queryByDay(date)
+        
+    @QtCore.pyqtSlot("QVariant")    
+    def queryByDate(self, date):
+        self._dateObj = date
+        self.queryByDay(self._dateObj.toString("yyyy-MM-dd"))
+    
 class PopupTrainModel(TrainModel):        
     
     def __init__(self, selectMoel, parent=None, connectSignals=True):

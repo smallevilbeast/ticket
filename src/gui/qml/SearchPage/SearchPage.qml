@@ -6,12 +6,16 @@ Item {
         id: searchForm
         anchors.top: parent.top
         anchors.topMargin: 40
-        
         anchors.horizontalCenter: parent.horizontalCenter
         z: 100
-        onClicked: {
+        onGrabClicked: {
             visible = false
             grabPage.visible = true
+        }
+        
+        onQueryClicked: {
+            visible = false
+            resultView.visible = true
         }
         
     }
@@ -26,4 +30,13 @@ Item {
         }
     }
     
+    ResultView {
+        id: resultView
+        visible: false
+        anchors.fill: parent
+        onBackClicked: {
+            visible = false
+            searchForm.visible = true
+        }
+    }
 }
