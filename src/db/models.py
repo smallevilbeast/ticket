@@ -92,14 +92,37 @@ class Passenger(BaseUserModel):
     class Meta:
         db_table = "ticket_passengers"
         
+class MonitorHistory(BaseUserModel):
+    passenger_codes = pw.CharField()
+    from_station = pw.CharField()
+    to_station = pw.CharField()
+    date = pw.CharField()
+    trains = pw.CharField()
+    seats = pw.CharField()
+    
+    class Meta:
+        db_table = "ticket_moniter"
+        
+class StationHistory(BaseUserModel):        
+    name = pw.CharField()
+    telecode = pw.CharField()
+    
+    class Meta:
+        db_table = "ticket_station_history"
+        
 def create_common_tables():
     Station.create_table()
     UserHistory.create_table()
     
+def create_user_tables():    
+    Passenger.create_table()
+    MonitorHistory.create_table()
+    StationHistory.create_table()
+    
 def insert_station_data():    
     f = xdg.get_data_file("station_names.txt")
     with open(f) as fp:
-        content = fp.read().strip("\n")
+        content = fp.read().decode("utf-8").strip("\n")
         lines = content.split("@")
         with disable_auto_commit(common_db):
             for line in lines:
@@ -129,7 +152,7 @@ def _init_user_db(sender, username, *args, **kwargs):
     created = False
     if not os.path.exists(db_file):
         user_db.connect()
-        Passenger.create_table()
+        create_user_tables()
         poster.request_passengers()
         created = True
     signals.db_init_finished.send(sender=user_db, created=created)    

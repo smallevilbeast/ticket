@@ -13,6 +13,11 @@ TextField {
             popupWindow.visible = false
         }
     }
+    onTextChanged: {
+        if (text == "") {
+            telecode = ""
+        }
+    }
     
     Connections {
         target: model
@@ -82,6 +87,7 @@ TextField {
     
     onLengthChanged: {
         if (!manualFlag) {
+            telecode = ""
             model.complete(text)
             completeView.currentIndex = 0
         }

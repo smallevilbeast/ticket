@@ -5,25 +5,39 @@ import "../Common" as Common
 import DGui 1.0
 
 Item {
+    id: root
     width: containerRow.width; height: containerRow.height
+    property alias enabled: addButton.enabled
+    property alias model: view.model
+    signal clicked
     
     Row {
         id: containerRow
         spacing: 10
         
         Widgets.AddButton {
-            onClicked: popupWindow.visible = true
+            id: addButton
+            enabled: false
+            onClicked: {
+                root.clicked()
+                popupWindow.visible = true
+            }
+            onEnabledChanged: {
+                if (!enabled) {
+                    displayRepeater.model.clear()
+                }
+            }
         }
         
         Repeater {
             id: displayRepeater
             anchors.verticalCenter: parent.verticalCenter
-            model: Poster.selectPassengerModel()
+            model: Poster.selectTrainModel()
             delegate: Component {
                 Text {
                     anchors.rightMargin: 8
                     anchors.verticalCenter: displayRepeater.verticalCenter
-                    text: instance.passengerName
+                    text: instance.stationTrainCode
                     color: "#1790C9"
                 }
             }
@@ -52,14 +66,14 @@ Item {
             anchors.fill: parent
             
             Component {
-                id: passengerDelegate
+                id: trainDelegate
                 Item {
                     id: wrapper
                     width: box.width; height: box.height
-                    property int code: instance.code
                     CheckBox {
                         id: box
-                        text: instance.passengerName
+                        text: instance.stationTrainCode + "(" + instance.fromStationName + "  " + instance.startTime + "→" + instance.toStationName +  "  " + instance.arriveTime + ")"
+                        checked: instance.checked
                         onClicked: {
                             if (checked) {
                                 if (displayRepeater.model.count >= 5) {
@@ -69,24 +83,16 @@ Item {
                                 }
                                 
                             } else {
-                                displayRepeater.model.removeObj(instance)
+                                displayRepeater.model.removeByTrainCode(instance.stationTrainCode)
                             }
                         }
                     }
                 }
             }
-            
-            Widgets.IconButton {
-                source: "qrc:/images/common/refresh.png"
-                anchors.right: parent.right
-                anchors.top: parent.top
-                iconWidth: 20; iconHeight: 20
-                onClicked: Poster.requestPassengers()
-            }
-            
+
             Text {
                 id: titleText
-                text: "选择乘车人(最多5人)"
+                text: "选择期望车次(按优先级,最多5个)"
                 font.pixelSize: 14
                 color: "#1790C9"
             }
@@ -99,9 +105,9 @@ Item {
                 GridView {
                     id: view
                     anchors.fill: parent
-                    cellWidth: 80; cellHeight: 26
-                    model: Poster.passengerModel()
-                    delegate: passengerDelegate
+                    cellWidth: width; cellHeight: 26
+                    model: Poster.newTrainModel()
+                    delegate: trainDelegate
                 }
             }
         }

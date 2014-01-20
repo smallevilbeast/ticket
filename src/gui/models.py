@@ -4,14 +4,13 @@
 from __future__ import unicode_literals
 
 from PyQt5 import QtCore
-
-from models import six
 import peewee as pw
+from utils import six
 from gui.qobject import QObjectListModel, ObjectWrapper, postGui
 from core.signals import query_trains_completed, query_tickets_completed
-from core.poster import SEAT_TYPE
-from db.models import user_db, Station, Passenger, UserHistory
+from core.poster import SEAT_TYPE, JSON_SEAT, poster
 from db import signals as dbSignals
+from db.models import user_db, Station, Passenger, UserHistory
 
 def peeweeWrapper(instance):
     params = instance.__dict__['_data']
@@ -42,29 +41,24 @@ class BaseModel(QObjectListModel):
             return item
         return QtCore.QVariant()        
     
+    @QtCore.pyqtSlot("QVariant")        
+    def addObj(self, obj):
+        self.append(obj)
+        
+    @QtCore.pyqtSlot("QVariant")    
+    def removeObj(self, obj):
+        self.remove(obj)
+    
 
 class TrainModel(BaseModel):
     
-    SeatType = {
-        "gr_num" : "高级软卧",
-        "qt_num" : "其他",
-        "rw_num" : "软卧",
-        "rz_num" : "软座",
-        "tz_num" : "特等座",
-        "wz_num" : "无座",
-        "yw_num" : "硬卧",
-        "yz_num" : "硬座",
-        "ze_num" : "二等座",
-        "zy_num" : "一等座",
-        "swz_num" : "商务座",
-    }
-    
     SeatSorted = "商务座 特等座 一等座 二等座 高级软卧 软卧 硬卧 软座 硬座 无座 其他".split()
     
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, connectSignals=True):
         super(TrainModel, self).__init__(parent)
-        query_trains_completed.connect(self.onQueryTrainsCompleted)
-        query_tickets_completed.connect(self.onQueryTicketsCompleted)
+        if connectSignals:
+            query_trains_completed.connect(self.onQueryTrainsCompleted, sender=self)
+            query_tickets_completed.connect(self.onQueryTicketsCompleted, sender=self)
 
         
     @classmethod    
@@ -73,10 +67,10 @@ class TrainModel(BaseModel):
         seats = []
         for k, v in six.iteritems(queryItem):
             nk = stringTitle(k)
-            if k in cls.SeatType and v != "--":
+            if k in JSON_SEAT and v != "--":
                 try: numValue = int(v)
                 except: numValue = 0    
-                seat = dict(name=cls.SeatType[k], num=numValue)                
+                seat = dict(name=JSON_SEAT[k], num=numValue)                
                 seats.append(ObjectWrapper(seat))
             else:    
                 result[nk] = v
@@ -87,7 +81,7 @@ class TrainModel(BaseModel):
         result['lishi'] = cls.parseLishiValue(result['lishiValue'])
         result['buttonTextInfo'] = result['note'].replace("<br/>", '    ')
         result['canBuy'] = "br" not in result['note']
-        return ObjectWrapper(result)
+        return result
     
     @classmethod
     def parseTicketQuery(cls, queryItem):
@@ -98,9 +92,9 @@ class TrainModel(BaseModel):
         result['secretStr'] = queryItem.pop("secretStr", "")
         for k, v in six.iteritems(queryLeftNewDTO):
             nk = stringTitle(k)
-            if k in cls.SeatType and v != "--":
+            if k in JSON_SEAT and v != "--":
                 if v == "无": v = 0
-                seat = dict(name=cls.SeatType[k], num=v)                
+                seat = dict(name=JSON_SEAT[k], num=v)                
                 seats.append(ObjectWrapper(seat))
             else:    
                 result[nk] = v
@@ -111,7 +105,7 @@ class TrainModel(BaseModel):
         result['lishi'] = cls.parseLishiValue(result['lishiValue'])
         result['canBuy'] = "br" not in result['buttonTextInfo']
         result['buttonTextInfo'] = result['buttonTextInfo'].replace("<br/>", '    ')
-        return ObjectWrapper(result)
+        return result
     
     @classmethod
     def getFromStationType(cls, result):
@@ -140,18 +134,54 @@ class TrainModel(BaseModel):
         #     return "{0:0>2}小时".format(x)
         return "{0:0>2}小时{1:0>2}分钟".format(x, mod)
     
+    def handleItem(self, item):
+        return ObjectWrapper(item)
+    
     @postGui()
     def onQueryTrainsCompleted(self, data, *args, **kwargs):
         self.clear()
+        if data is None:
+            return 
         for item in data:
-            self.append(self.parseQuery(item))
+            self.append(self.handleItem(self.parseQuery(item)))
             
     @postGui()        
     def onQueryTicketsCompleted(self, data, *args, **kwargs):
         self.clear()
+        if data is None:
+            return 
         for item in data:
-            self.append(self.parseTicketQuery(item))
+            self.append(self.handleItem(self.parseTicketQuery(item)))
+            
+    @QtCore.pyqtSlot(str, str, str)    
+    def queryTrains(self, fromStation, toStation, date):
+        poster.query_tickets(fromStation, toStation, date, sender=self)
         
+    @QtCore.pyqtSlot(str)    
+    def removeByTrainCode(self, trainCode):
+        obj = None
+        for item in self:
+            if item.stationTrainCode == trainCode:
+                obj = item
+                break
+        self.remove(obj)    
+        
+class PopupTrainModel(TrainModel):        
+    
+    def __init__(self, selectMoel, parent=None, connectSignals=True):
+        super(PopupTrainModel, self).__init__(parent, connectSignals)
+        
+        self._selectModel = selectMoel
+        
+    def handleItem(self, item):    
+        trainCode = item['stationTrainCode']
+        item["checked"] = False
+        for obj in self._selectModel:
+            if obj.stationTrainCode == trainCode:
+                item['checked'] = True
+                break
+        return super(PopupTrainModel, self).handleItem(item)
+                
 class StationModel(BaseModel):        
     
     @QtCore.pyqtSlot(str)
@@ -178,10 +208,11 @@ class StationModel(BaseModel):
         
 class PassengerModel(BaseModel):
     
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, connectSignals=True):
         super(PassengerModel, self).__init__(parent)
-        dbSignals.db_init_finished.connect(self.onDBInitFinished, sender=user_db)
-        dbSignals.post_save.connect(self.onPostSave, sender=Passenger)
+        if connectSignals:
+            dbSignals.db_init_finished.connect(self.onDBInitFinished, sender=user_db)
+            dbSignals.post_save.connect(self.onPostSave, sender=Passenger)
         
     @postGui()    
     def onDBInitFinished(self, created, *args, **kwargs):
@@ -197,19 +228,6 @@ class PassengerModel(BaseModel):
     def onPostSave(self, instance, *args, **kwargs):
         self.append(peeweeWrapper(instance))
 
-        
-class SelectPassengerModel(BaseModel):        
-    
-    
-    @QtCore.pyqtSlot("QVariant")
-    def addPassenger(self, obj):
-        self.append(obj)
-        
-    @QtCore.pyqtSlot("QVariant")    
-    def removePassenger(self, obj):
-        self.remove(obj)
-
-        
 class UserHistoryModel(BaseModel):        
     
     def __init__(self, parent=None):
@@ -240,14 +258,6 @@ class SeatModel(BaseModel):
         
         if initSeats:
             self.initSeats()
-        
-    @QtCore.pyqtSlot("QVariant")        
-    def addSeat(self, obj):        
-        self.append(obj)
-        
-    @QtCore.pyqtSlot("QVariant")    
-    def removeSeat(self, obj):
-        self.remove(obj)
 
     def initSeats(self):    
         for k, v in six.iteritems(SEAT_TYPE):

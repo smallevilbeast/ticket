@@ -13,6 +13,7 @@ from utils.six.moves import http_cookiejar as cookielib
 from core import signals 
 from utils import xdg
 from utils import common
+from utils import six
 from collections import OrderedDict
 from utils.six.moves.urllib.parse import unquote
 from datetime import datetime
@@ -21,15 +22,32 @@ logger = logging.getLogger("Poster")
 
 SEAT_TYPE = OrderedDict()
 SEAT_TYPE['商务座'] = "9"
+SEAT_TYPE['特等座'] = "P"
 SEAT_TYPE['一等座'] = "M"
 SEAT_TYPE['二等座'] = "O"
-SEAT_TYPE['高级软卧'] = "6"
+SEAT_TYPE['高级软卧'] = "5"
 SEAT_TYPE['软卧'] = "4"
 SEAT_TYPE['硬卧'] = "3"
 SEAT_TYPE['软座'] = "2"
 SEAT_TYPE['硬座'] = "1"
 SEAT_TYPE['无座'] = "1"
 SEAT_TYPE['其他'] = ""
+
+JSON_SEAT = {
+    "gr_num" : "高级软卧",
+    "qt_num" : "其他",
+    "rw_num" : "软卧",
+    "rz_num" : "软座",
+    "tz_num" : "特等座",
+    "wz_num" : "无座",
+    "yw_num" : "硬卧",
+    "yz_num" : "硬座",
+    "ze_num" : "二等座",
+    "zy_num" : "一等座",
+    "swz_num" : "商务座",
+}
+
+REVERSAL_JSON_SEAT = dict((v, k) for k,v in six.iteritems(JSON_SEAT))
 
 class Poster(object):
     
@@ -101,14 +119,14 @@ class Poster(object):
         with open(path, 'wb') as fd:
             for chunk in ret.iter_content(2048):
                 fd.write(chunk)
-        signals.passcode_newed.send(sender=self, module="login", url=path, ran_code="sjrand")            
+        signals.passcode_newed.send(sender=self, module=module, url=path, ran_code=rand)            
     
     @common.threaded    
-    def check_passcode(self, rand_code):
-        data = dict(randCode=rand_code, rand="sjrand")
+    def check_passcode(self, rand_code, module, rand="sjrand"):
+        data = dict(randCode=rand_code, rand=rand)
         ret = self._session.post("https://kyfw.12306.cn/otn/passcodeNew/checkRandCodeAnsyn", data=data).json()
         if ret.get("data", "N") == "Y":
-            signals.passcode_checked.send(sender=self, value=True)
+            signals.passcode_checked.send(sender=self, module=module, value=True)
         else:    
             self.new_passcode()
             
@@ -136,11 +154,14 @@ class Poster(object):
         return ret
         
     @common.threaded    
-    def query_trains(self, from_station, to_station, date):    
+    def query_trains(self, from_station, to_station, date, sender=None):    
         if not from_station or not to_station or not date:
             signals.error_excepted.send(sender=self, type_="query", info="请输入完整信息")
             return
         
+        if sender is None: 
+            sender = self
+            
         _data = OrderedDict()
         _data['purpose_codes'] = "ADULT"
         _data['queryDate'] = date
@@ -155,16 +176,20 @@ class Poster(object):
         data = ret.get("data", {})
         flag = data.get("flag", False)
         if flag:
-            signals.query_trains_completed.send(sender=self, data=data.get("datas"))
+            signals.query_trains_completed.send(sender=sender, data=data.get("datas"))
         else:    
             message = data.get("message", "")
             signals.error_excepted.send(sender=self, type_="query", info=message)
             
     @common.threaded        
-    def query_tickets(self, from_station, to_station, date):        
+    def query_tickets(self, from_station, to_station, date, sender=None, sendError=True):        
         if not from_station or not to_station or not date:
             signals.error_excepted.send(sender=self, type_="query", info="请输入完整信息")
             return
+        
+        if sender is None: 
+            sender = self
+        
         url = "https://kyfw.12306.cn/otn/leftTicket/query"
         data = OrderedDict()
         data['leftTicketDTO.train_date'] = date
@@ -178,9 +203,14 @@ class Poster(object):
         
         ret_data = ret.get("data", [])
         if not ret_data:
-            signals.error_excepted.send(sender=self, type_="query", info="".join(ret.get("messages", [])))
-        else:    
-            signals.query_tickets_completed.send(sender=self, data=ret_data)
+            ret_data = None            
+            if sendError:    
+                msg = "".join(ret.get("messages", []))
+                if not msg.strip():
+                    msg = "没有查询到结果, 请注意购票日期"
+                signals.error_excepted.send(sender=self, type_="query", info=msg)
+
+        signals.query_tickets_completed.send(sender=sender, data=ret_data)
             
     @staticmethod
     def re_search(pattern, content):
@@ -221,10 +251,12 @@ class Poster(object):
     @common.threaded
     def grab_tickets(self, train, date, passengers, seat_type):
         if not self.submit_order_request(train):
+            signals.query_tickets_failed.send(sender=self)
             return False
         
         ret = self.confirm_passenger()
         if not ret:
+            signals.query_tickets_failed.send(sender=self)
             return False
         
         self._order_infos.clear()
@@ -245,20 +277,20 @@ class Poster(object):
         
         ret = self.check_order_info()
         if not ret:
-            signals.grab_ticket_failed.send(sender=self)
+            signals.grab_tickets_failed.send(sender=self)
             return
         
         ret = self.get_quque_count()
         if not ret:
-            signals.grab_ticket_failed.send(sender=self)
+            signals.grab_tickets_failed.send(sender=self)
             return
         
         ret = self.confirm_order()
         if not ret:
-            signals.grab_ticket_failed.send(sender=self)
+            signals.grab_tickets_failed.send(sender=self)
             return
         
-        signals.grab_ticket_successed.send(sender=self)
+        signals.grab_tickets_successed.send(sender=self)
     
     def submit_order_request(self, train):        
         url = "https://kyfw.12306.cn/otn/leftTicket/submitOrderRequest"

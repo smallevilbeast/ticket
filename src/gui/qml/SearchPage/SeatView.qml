@@ -11,15 +11,8 @@ Item {
         id: containerRow
         spacing: 10
         
-        Image {
-            anchors.verticalCenter: parent.verticalCenter
-            source: "qrc:/images/common/user_blue_add.png"
-            width: 22; height: 22
-            
-            MouseArea {
-                anchors.fill: parent
-                onClicked: popupWindow.visible = true
-            }
+        Widgets.AddButton {
+            onClicked: popupWindow.visible = true
         }
         
         Repeater {
@@ -41,6 +34,8 @@ Item {
         id: popupWindow
         anchors.top: parent.bottom
         anchors.left: parent.left
+        anchors.leftMargin: -10
+        anchors.topMargin: -8
         borderMargin: 10
         width: parent.width + sideWidth + 6
         height: Math.max(Math.min(titleText.height + view.contentHeight + sideWidth*2 + 10,  180+sideWidth*2),  26+sideWidth * 2)
@@ -69,11 +64,11 @@ Item {
                                 if (displayRepeater.model.count >= 5) {
                                     checked = false
                                 } else {
-                                    displayRepeater.model.addSeat(instance)
+                                    displayRepeater.model.addObj(instance)
                                 }
                                 
                             } else {
-                                displayRepeater.model.removeSeat(instance)
+                                displayRepeater.model.removeObj(instance)
                             }
                         }
                     }

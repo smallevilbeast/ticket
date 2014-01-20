@@ -3,7 +3,9 @@ import "../Common" as Common
 import "../Widgets" as Widgets
 
 Column {
+    id: root
     spacing: 10
+    signal clicked
     
     Row {
         spacing: 20
@@ -11,9 +13,10 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 5
             Text {
-                anchors.horizontalCenter: parent.horizontalCenter
+                /* anchors.horizontalCenter: parent.horizontalCenter */
                 text: "出发站"
-                color: "#8e8e8e"
+                color: "#333333"
+                font.pixelSize: 14
             }
             Widgets.CompleteInput {
                 id: fromStation
@@ -44,9 +47,10 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 5
             Text {
-                anchors.horizontalCenter: parent.horizontalCenter            
-                text: "出发站"
-                color: "#8e8e8e"
+                /* anchors.horizontalCenter: parent.horizontalCenter             */
+                text: "目的站"
+                font.pixelSize: 14
+                color: "#333333"
             }
             Widgets.CompleteInput {
                 id: toStation
@@ -60,31 +64,52 @@ Column {
     
     Row {
         spacing: 10
-        Text { text: "日期"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
-        Widgets.Calendar { id: calendar; anchors.verticalCenter: parent.verticalCenter; width: 210}
+        Text { text: "乘车日期"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
+        Widgets.Calendar { id: calendar; anchors.verticalCenter: parent.verticalCenter; width: 182}
     }
     
-    PassengerView {
-        width: 250
+    
+    
+    Row {
+        Text { text: "选择乘客"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
+        PassengerView {
+            width: 250
+        }
+        spacing: 10
         z: 800
     }
-    
-    SeatView {
-        width: 250
-        z: 700
+        
+    Row {
+        Text { text: "期望车次"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
+        TrainView {
+            width: 250
+            enabled: fromStation.telecode && toStation.telecode && calendar.text
+            onClicked: {
+                model.queryTrains(fromStation.telecode, toStation.telecode, calendar.text)
+            }
+        }
+        spacing: 10
+        z: 700        
     }
     
-    Widgets.TextField {
-        width: 250
-        Keys.onReturnPressed: {
-            Poster.submitTickets(text)
+
+    Row {
+        Text { text: "期望席别"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
+        SeatView {
+            width: 250
         }
+        spacing: 10
+        z: 600        
     }
 
     Widgets.Button {
-        text: "查询"
+        text: "开始抢票"
         width: 250; height: 36
-        onClicked: Poster.queryTrains(fromStation.telecode, toStation.telecode, calendar.text)
+        onClicked: {
+            if (fromStation.telecode != "" && toStation.telecode != "" && calendar.text) {
+                root.clicked()
+                Poster.grabQueryTickets(fromStation.telecode, toStation.telecode, calendar.text)
+            }
+        }
     }
-    
 }

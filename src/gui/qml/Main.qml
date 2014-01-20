@@ -32,7 +32,7 @@ Common.DWindow {
             z: 1000
         }
         LoginPage.LoginPage {id: loginPage;  anchors.fill: parent }
-        SearchPage.SearchPage { id: searchPage; anchors.fill: parent; visible: false}
+        SearchPage.SearchPage { id: searchPage; anchors.fill: parent; visible: false }
     }
     
 }

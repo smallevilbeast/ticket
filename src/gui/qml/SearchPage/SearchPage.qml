@@ -3,27 +3,27 @@ import "../Widgets" as Widgets
 
 Item {
     SearchForm {
+        id: searchForm
         anchors.top: parent.top
         anchors.topMargin: 40
-        id: searchForm
         
         anchors.horizontalCenter: parent.horizontalCenter
         z: 100
+        onClicked: {
+            visible = false
+            grabPage.visible = true
+        }
+        
     }
     
-    Widgets.ScrollWidget {
-        anchors.top: searchForm.bottom
-        anchors.bottom: parent.bottom
-        anchors.topMargin: 10
-        width: parent.width
-
-        ListView {
-            id: resultView
-            anchors.fill: parent
-            model: Poster.trainModel()
-            delegate: SiteDelegate {}
-            clip: true
+    GrabPage {
+        anchors.fill: parent
+        id: grabPage
+        visible: false
+        onClicked: {
+            visible = false
+            searchForm.visible = true
         }
-
     }
+    
 }
