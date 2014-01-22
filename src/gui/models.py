@@ -5,6 +5,8 @@ from __future__ import unicode_literals
 
 from PyQt5 import QtCore
 import peewee as pw
+
+import db.models
 from utils import six
 from datetime import datetime
 from gui.qobject import QObjectListModel, ObjectWrapper, postGui
@@ -12,7 +14,7 @@ from gui import signals as guiSignals
 from core.signals import query_trains_completed, query_tickets_completed
 from core.poster import SEAT_TYPE, JSON_SEAT, poster
 from db import signals as dbSignals
-from db.models import user_db, Station, Passenger, UserHistory
+from db.models import common_db, user_db, Station, Passenger, UserHistory
 
 def peeweeWrapper(instance):
     params = instance.__dict__['_data']
@@ -267,8 +269,10 @@ class UserHistoryModel(BaseModel):
     
     def __init__(self, parent=None):
         super(UserHistoryModel, self).__init__(parent)
-        # dbSignals.db_init_finished.connect(self.onDBInitFinished, sender=common_db)
-        self.addAllUser()
+        if db.models.COMMON_DB_INITED:
+            self.addAllUser()
+        else:    
+            dbSignals.db_init_finished.connect(self.onDBInitFinished, sender=common_db)
         
     def addAllUser(self):    
         query = UserHistory.select()

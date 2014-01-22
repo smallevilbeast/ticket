@@ -24,6 +24,7 @@ common_db = pw.SqliteDatabase(None, check_same_thread=False, threadlocals=True)
 user_db = pw.SqliteDatabase(None, check_same_thread=False, threadlocals=True)
 
 VERSION = "1"
+COMMON_DB_INITED = False
 
 @contextmanager
 def disable_auto_commit(db):
@@ -133,6 +134,7 @@ def insert_station_data():
                 Station.create(**params)
                 
 def _init_common_db():
+    global COMMON_DB_INITED
     db_file = xdg.get_cache_file("ticket_common_{0}.db".format(VERSION))
     common_db.init(db_file)
     created = False
@@ -142,6 +144,7 @@ def _init_common_db():
         insert_station_data()
         created = True
     signals.db_init_finished.send(sender=common_db, created=created)        
+    COMMON_DB_INITED = True
 
     
 @receiver(core_signals.login_successed)
