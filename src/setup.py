@@ -9,6 +9,8 @@ import fnmatch
 
 from distutils.core import setup
 
+VERSION = "0.9"
+
 
 try:
     # delete previous build
@@ -67,7 +69,7 @@ if sys.platform.startswith("win"):
     
     data_files = []
     data_files_args = [
-        ("gui", ("*.png", "*.jpg", "*.qml", "*.js")),
+        ("gui", ("*.png", "*.jpg", "*.qml", "*.js", "*.ico")),
         ("data", ("*.txt",)),
         (os.path.join(PYQT5_DIR, "plugins", "iconengines"), ("*.dll",)),
         (os.path.join(PYQT5_DIR, "plugins", "platforms"), ("*.dll",)),
@@ -81,12 +83,18 @@ if sys.platform.startswith("win"):
     for srcdir, wildcards in data_files_args:
         data_files.extend(find_data_files(srcdir, *wildcards))
         
-    setup(console=[{"script" : "main.py"}],
+    setup(windows=[{"script" : "main.py",
+                    "icon_resources": [(1, 'gui\\images\\common\\logo.ico')]
+                    }],
           zipfile=None,
           data_files=data_files,
           options={"py2exe" : {
-              "includes" : ["sip", "PyQt5.QtOpenGL"],
+              "includes" : ["sip"],
               "optimize": 1,              
-              "compressed" : True,
-          }}
+             # "compressed" : True,
+              "dll_excludes": ["MSVCP100.dll", "MSVCP90.dll"],
+          }},
+          version=VERSION,
+          description="12306抢票助手".decode('utf-8'),
+          name="EVTicket"
     )
