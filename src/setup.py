@@ -4,9 +4,10 @@
 import os
 import sys
 import shutil
-from distutils.core import setup
-from glob import glob
+import glob
+import fnmatch
 
+from distutils.core import setup
 
 
 try:
@@ -19,29 +20,65 @@ except:
     pass
 
 
+def opj(*args):
+    path = os.path.join(*args)
+    return os.path.normpath(path)
+
+def find_data_files(srcdir, *wildcards, **kw):
+    
+    def walk_helper(arg, dirname, files):
+        names = []
+        lst, wildcards = arg
+        for wc in wildcards:
+            wc_name = opj(dirname, wc)
+            for f in files:
+                filename = opj(dirname, f)
+                
+                if fnmatch.fnmatch(filename, wc_name) and not os.path.isdir(filename):
+                    names.append(filename)
+            if names:
+                path = os.path.split(srcdir)[0] + os.path.sep
+                d = dirname.replace(path, "")
+                lst.append( (d, names ) )
+ 
+    file_list = []
+    recursive = kw.get('recursive', True)
+    if recursive:
+        os.path.walk(srcdir, walk_helper, (file_list, wildcards))
+    else:
+        walk_helper((file_list, wildcards), srcdir, [os.path.basename(f) for f in glob.glob(opj(srcdir, '*'))])
+    return file_list
+
 if sys.platform.startswith("win"):
     
     # import struct
     # bitness = struct.calcsize("P") * 8    
     
-    PYQT5_DIR = r"C:\Python27\Lib\site-packages\PyQt5"
+    PYQT5_DIR = "C:\\Python27\\lib\\site-packages\\PyQt5"
     
     try:
         import py2exe
     except ImportError:
         raise RuntimeError, "Cannot import py2exe"    
     
-    data_files = [
-        ("data\station_names.txt"),
-        ("iconengines", glob(PYQT5_DIR + r'\plugins\iconengines\*.dll')),
-        ("imageformats", glob(PYQT5_DIR + r'\plugins\imageformats\*.dll'))
+    data_files = []
+    data_files_args = [
+        ("gui", (".png", ".jpg", ".qml")),
+        ("data", (".txt",)),
+        (os.path.join(PYQT5_DIR, "plugins", "iconengines"), (".dll",)),
+        (os.path.join(PYQT5_DIR, "plugins", "platforms"), (".dll",)),
+        (os.path.join(PYQT5_DIR, "plugins", "imageformats"), (".dll",)),
+        (os.path.join(PYQT5_DIR, "plugins", "PyQt5"), (".dll",)),
     ]
     
-    setup(windows=[{"script" : "main.py"}],
+    for srcdir, wildcards in data_files_args:
+        data_files.extend(find_data_files(srcdir, *wildcards))
+    
+    setup(console=[{"script" : "main.py"}],
           zipfile=None,
           data_files=data_files,
           options={"py2exe" : {
-              "includes" : "sip",
+              "includes" : ["sip", "PyQt5.QtOpenGl"],
               "dll_excludes" : ["msvcp110.dll"],
               "optimize": 1,              
           }}
