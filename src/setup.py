@@ -87,5 +87,6 @@ if sys.platform.startswith("win"):
           options={"py2exe" : {
               "includes" : ["sip", "PyQt5.QtOpenGL"],
               "optimize": 1,              
+              "compressed" : True,
           }}
     )
