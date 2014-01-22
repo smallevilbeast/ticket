@@ -5,17 +5,16 @@
 --------
 
 ```
-pip install requests peewee 
+pip install requests 
 ```
 或
 ```
-easy_install requests peewee
+easy_install requests 
 ```
 
 关于PyQt5
 ---------
-经测试可以在Mac, Linux上运行, 由于Windows版PyQt5没有编译OpenGL, 如果想
-在Windows测试, 需要下载源码进行编译安装
+经测试可以在Mac, Linux, Windows上运行
 
 关于Python
 ----------
