@@ -63,6 +63,9 @@ class PosterControl(QPropertyObject()):
         
     @postGui()    
     def onPasscodeNewed(self, url, module, ran_code, *args, **kwargs):    
+        url = url.replace("\\", "/")
+        if not url.startswith("/"):
+            url = "/" + url
         self.passcodeNewed.emit(module, url)
         
     @QtCore.pyqtSlot(str)
