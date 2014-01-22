@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 
 from datetime import datetime    
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 from utils.xdg import get_gui_file
 from gui.base import BaseView
@@ -23,8 +24,11 @@ class Instance(BaseView):
     
     def __init__(self, parent=None):
         super(Instance, self).__init__(parent)
-        QtWidgets.qApp.focusWindowChanged.connect(self.onFocusWindowChanged)
         
+        self.setTitle("抢票助手")
+        self.setIcon(QtGui.QIcon(":/images/common/logo.png"))
+        
+        QtWidgets.qApp.focusWindowChanged.connect(self.onFocusWindowChanged)
         guiSignals.calendar_date_changed.connect(self.onCalendarDateChanged)
         self._calendar = Calendar()
         self._calendar.calendar.clicked.connect(self.onCalendarActivated)
@@ -35,10 +39,12 @@ class Instance(BaseView):
         self._posterControl = PosterControl(self)
         self.setContextProperty("Poster", self._posterControl)        
         self.setSource(QtCore.QUrl.fromLocalFile(get_gui_file("qml", 'Main.qml')))
+
         
     @QtCore.pyqtSlot()    
     def closeWindow(self):
-        pass
+        self.hide()
+        QtWidgets.qApp.quit()
     
     @QtCore.pyqtSlot(int, int)
     def showCalendar(self, x, y):

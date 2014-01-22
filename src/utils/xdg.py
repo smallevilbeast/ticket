@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import time
 
 from utils import common
@@ -13,8 +14,12 @@ _home = os.path.expanduser('~')
 xdg_cache_home = os.environ.get('XDG_CACHE_HOME') or \
             os.path.join(_home, '.cache')
 
-program_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+if hasattr(sys, 'frozen'):
+    program_dir = os.path.dirname(os.path.realpath(sys.executable))
+else:
+    program_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
+    
 def get_cache_file(path):
     ''' get cache file. '''
     cachefile = os.path.join(xdg_cache_home, PROGRAM_NAME, path)

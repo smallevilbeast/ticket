@@ -83,6 +83,7 @@ Item {
                 text: "还没有帐号"
                 color: "#0094dc"
                 anchors.verticalCenter: parent.verticalCenter
+                url: "https://kyfw.12306.cn/otn/regist/init"
             }
 
         }

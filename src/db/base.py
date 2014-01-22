@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from peewee import Model as _Model
+from utils.peewee import Model as _Model
 from db import signals 
 
 class Model(_Model):

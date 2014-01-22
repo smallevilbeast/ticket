@@ -7,11 +7,12 @@ import os
 import sys
 import logging
 import traceback
-import peewee as pw
+
 from contextlib import contextmanager
 
 from utils import xdg
 from utils import common
+from utils import peewee as pw
 from db.base import Model
 from db import signals
 from core import signals as core_signals

@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file>images/common/logo.png</file>
     <file>images/common/back_press.png</file>
     <file>images/common/back_normal.png</file>
     <file>images/common/icon_add_normal.png</file>

@@ -37,8 +37,12 @@ def find_data_files(srcdir, *wildcards, **kw):
                 if fnmatch.fnmatch(filename, wc_name) and not os.path.isdir(filename):
                     names.append(filename)
             if names:
-                path = os.path.split(srcdir)[0] + os.path.sep
-                d = dirname.replace(path, "")
+                path = os.path.dirname(srcdir) + os.path.sep
+                if path != os.path.sep:
+                    d = dirname.replace(path, '')
+                else:
+                    d = dirname
+                print path, dirname, d
                 lst.append( (d, names ) )
  
     file_list = []
@@ -52,7 +56,7 @@ def find_data_files(srcdir, *wildcards, **kw):
 if sys.platform.startswith("win"):
     
     # import struct
-    # bitness = struct.calcsize("P") * 8    
+    # bitness = struct.calcsize("P") * 8
     
     PYQT5_DIR = "C:\\Python27\\lib\\site-packages\\PyQt5"
     
@@ -63,23 +67,25 @@ if sys.platform.startswith("win"):
     
     data_files = []
     data_files_args = [
-        ("gui", (".png", ".jpg", ".qml")),
-        ("data", (".txt",)),
-        (os.path.join(PYQT5_DIR, "plugins", "iconengines"), (".dll",)),
-        (os.path.join(PYQT5_DIR, "plugins", "platforms"), (".dll",)),
-        (os.path.join(PYQT5_DIR, "plugins", "imageformats"), (".dll",)),
-        (os.path.join(PYQT5_DIR, "plugins", "PyQt5"), (".dll",)),
+        ("gui", ("*.png", "*.jpg", "*.qml", "*.js")),
+        ("data", ("*.txt",)),
+        (os.path.join(PYQT5_DIR, "plugins", "iconengines"), ("*.dll",)),
+        (os.path.join(PYQT5_DIR, "plugins", "platforms"), ("*.dll",)),
+        (os.path.join(PYQT5_DIR, "plugins", "imageformats"), ("*.dll",)),
+        (os.path.join(PYQT5_DIR, "plugins", "PyQt5"), ("*.dll",)),
+        (os.path.join(PYQT5_DIR, "qml", "QtQuick.2"), ("*",)),
+        (os.path.join(PYQT5_DIR, "qml", "QtQuick"), ("*",)),
+        (os.path.join(PYQT5_DIR, "qml", "QtGraphicalEffects"), ("*",)),
     ]
     
     for srcdir, wildcards in data_files_args:
         data_files.extend(find_data_files(srcdir, *wildcards))
-    
+        
     setup(console=[{"script" : "main.py"}],
           zipfile=None,
           data_files=data_files,
           options={"py2exe" : {
-              "includes" : ["sip", "PyQt5.QtOpenGl"],
-              "dll_excludes" : ["msvcp110.dll"],
+              "includes" : ["sip", "PyQt5.QtOpenGL"],
               "optimize": 1,              
           }}
     )

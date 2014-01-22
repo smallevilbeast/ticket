@@ -4,10 +4,11 @@
 from __future__ import unicode_literals
 
 from PyQt5 import QtCore
-import peewee as pw
+
 
 import db.models
 from utils import six
+from utils import peewee as pw
 from datetime import datetime
 from gui.qobject import QObjectListModel, ObjectWrapper, postGui
 from gui import signals as guiSignals
