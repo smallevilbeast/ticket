@@ -1,6 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
+
+if sys.platform == "win32":
+    reload(sys)
+    sys.setdefaultencoding('gbk')
+
 import os
 from PyQt5 import QtCore
 if os.name == 'posix':
@@ -10,8 +16,8 @@ import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import logging
-# logging.basicConfig(level=logging.DEBUG) # change to 'DEBUG' to see more
-logging.basicConfig(level=logging.ERROR) # change to 'DEBUG' to see more
+logging.basicConfig(level=logging.DEBUG) # change to 'DEBUG' to see more
+#logging.basicConfig(level=logging.ERROR) # change to 'DEBUG' to see more
 
 from PyQt5 import QtWidgets
 import gui.resource_rc

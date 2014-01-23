@@ -89,10 +89,11 @@ if sys.platform.startswith("win"):
           zipfile=None,
           data_files=data_files,
           options={"py2exe" : {
-              "includes" : ["sip"],
+              "includes" : ["sip", "PyQt5.QtQml", "PyQt5.QtQuick"],
               "optimize": 1,              
              # "compressed" : True,
-              "dll_excludes": ["MSVCP100.dll", "MSVCP90.dll"],
+              "dll_excludes": ["MSVCP100.dll", "MSVCP90.dll", "w9xpopen.exe"],
+             # "bundle_files": 2,
           }},
           version=VERSION,
           description="12306抢票助手".decode('utf-8'),
