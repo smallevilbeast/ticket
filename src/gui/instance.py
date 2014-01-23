@@ -27,7 +27,6 @@ class Instance(BaseView):
         
         self.setTitle("抢票助手")
         self.setIcon(QtGui.QIcon(":/images/common/logo.png"))
-        
         QtWidgets.qApp.focusWindowChanged.connect(self.onFocusWindowChanged)
         guiSignals.calendar_date_changed.connect(self.onCalendarDateChanged)
         self._calendar = Calendar()
@@ -39,7 +38,6 @@ class Instance(BaseView):
         self._posterControl = PosterControl(self)
         self.setContextProperty("Poster", self._posterControl)        
         self.setSource(QtCore.QUrl.fromLocalFile(get_gui_file("qml", 'Main.qml')))
-
         
     @QtCore.pyqtSlot()    
     def closeWindow(self):

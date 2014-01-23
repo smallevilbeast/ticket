@@ -140,9 +140,9 @@ Component {
                 anchors.verticalCenter: parent.verticalCenter                
                 anchors.rightMargin: 60
                 text: instance.canBuy ? instance.buttonTextInfo : "抢票"
-                onClicked: {
-                    Poster.test(instance)
-                }
+                /* onClicked: { */
+                /*     Poster.test(instance) */
+                /* } */
 
             }
             
