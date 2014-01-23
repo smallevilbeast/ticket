@@ -12,7 +12,7 @@ class BaseView(QtQuick.QQuickView):
         surface_format.setAlphaBufferSize(8)
         self.setColor(QtGui.QColor(0, 0, 0, 0))
         self.setFormat(surface_format)
-        self.setFlags(QtCore.Qt.FramelessWindowHint)
+        self.setFlags(QtCore.Qt.FramelessWindowHint|QtCore.Qt.Window)
         self.root_context = self.rootContext()        
         self.setContextProperty("windowView", self)        
         

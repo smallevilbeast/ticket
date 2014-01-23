@@ -11,7 +11,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import logging
 # logging.basicConfig(level=logging.DEBUG) # change to 'DEBUG' to see more
-logging.basicConfig(level=logging.INFO) # change to 'DEBUG' to see more
+logging.basicConfig(level=logging.ERROR) # change to 'DEBUG' to see more
 
 from PyQt5 import QtWidgets
 import gui.resource_rc
