@@ -18,5 +18,6 @@ ButtonStyle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 14
+        renderType: Text.NativeRendering                
     }
 }
