@@ -57,6 +57,8 @@ def unquote(s):
     return urllib.unquote(s)
 
 def get_md5(chars):
+    if isinstance(chars, unicode):
+        chars = chars.encode("utf-9")
     return hashlib.md5(chars).hexdigest()
 
 

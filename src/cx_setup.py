@@ -44,7 +44,7 @@ setup(
                            "excludes" : ['Tkinter'],
                            "optimize" : 2,
                            "compressed" : True,
-                           # "include_msvcr" : True,
+                           "include_msvcr" : True,
                        }},
     executables=[
         Executable(script="main.py",
