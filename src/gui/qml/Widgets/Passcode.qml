@@ -55,7 +55,7 @@ Rectangle {
             anchors.centerIn: parent
             spacing: 10
                 
-            Text {
+            NativeText {
                 text: "因12306屏蔽工具, 您需要手动输入"
                 color: "#39a954"
             }
@@ -97,7 +97,8 @@ Rectangle {
                 }
             }
                 
-            Text {
+            NativeText {
+                renderType: Text.NativeRendering                                
                 text: "12306的cookie有效期很短, Fuck 12306!!!"
                 color: "#f08400"
             }

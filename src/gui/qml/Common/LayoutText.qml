@@ -3,6 +3,7 @@ import QtQuick 2.1
 Text {
     id: textItem
  
+    renderType: Text.NativeRendering                                
     property real minWidth: 0
     property real maxWidth: 10000
  
@@ -54,6 +55,7 @@ Text {
         // which leads to wrong dimensions.
         onTextChanged: updateWidth()
         onFontChanged: updateWidth()
+        renderType: Text.NativeRendering                                
     }
  
     onMinWidthChanged: updateWidth()

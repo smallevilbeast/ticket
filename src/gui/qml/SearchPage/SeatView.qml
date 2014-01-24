@@ -20,7 +20,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             model: Poster.selectSeatModel()
             delegate: Component {
-                Text {
+                Widgets.NativeText {
                     anchors.rightMargin: 8
                     anchors.verticalCenter: displayRepeater.verticalCenter
                     text: instance.seatName
@@ -75,7 +75,7 @@ Item {
                 }
             }
 
-            Text {
+            Widgets.NativeText {
                 id: titleText
                 text: "选择期望席别(按优先级,最多5人)"
                 font.pixelSize: 14

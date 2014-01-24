@@ -34,13 +34,14 @@ Component {
                     
                 }
                 
-                Text {
+                Widgets.NativeText {
                     id: nameText;
                     text: name + ":"
                     color: adjustTitleColor()
                     font.pixelSize: 11
                 }
-                Text {
+
+                Widgets.NativeText {
                     id: numText
                     color: adjustColor()
                     font.pixelSize: 11
@@ -50,7 +51,7 @@ Component {
         
         Component {
             id: futureComponent
-            Text {
+            Widgets.NativeText {
                 color: "#8e8e8e"
             }
         }
@@ -102,7 +103,7 @@ Component {
                 
                 Column {
                     spacing: contentColumnSpacing
-                    Text {
+                    Widgets.NativeText {
                         text: instance.stationTrainCode
                         anchors.horizontalCenter: parent.horizontalCenter
                         /* font.pixelSize: 18 */
@@ -110,7 +111,7 @@ Component {
                         font.weight: Font.Bold
                     }
                     
-                    Text {
+                    Widgets.NativeText {
                         text: instance.lishi
                     }
                 }

@@ -1,7 +1,6 @@
 import QtQuick 2.1
 
-Text {
-    
+NativeText {
     property url url
     
     MouseArea {

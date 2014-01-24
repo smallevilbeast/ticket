@@ -34,7 +34,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             model: Poster.selectTrainModel()
             delegate: Component {
-                Text {
+                Widgets.NativeText {
                     anchors.rightMargin: 8
                     anchors.verticalCenter: displayRepeater.verticalCenter
                     text: instance.stationTrainCode
@@ -90,7 +90,7 @@ Item {
                 }
             }
 
-            Text {
+            Widgets.NativeText {
                 id: titleText
                 text: "选择期望车次(按优先级,最多5个)"
                 font.pixelSize: 14

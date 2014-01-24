@@ -27,7 +27,7 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 20
         
-        Text {
+        NativeText {
             id: message
             color: "#ef3f22"
             anchors.verticalCenter: parent.verticalCenter

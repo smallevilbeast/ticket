@@ -41,7 +41,7 @@ TextField {
                 anchors.fill: parent
             }
 
-            Text {
+            NativeText {
                 anchors.left: parent.left
                 anchors.leftMargin: 5
                 anchors.verticalCenter: parent.verticalCenter

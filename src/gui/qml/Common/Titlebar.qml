@@ -1,5 +1,6 @@
 import QtQuick 2.1
 import "../scripts/common.js" as Common
+import "../Widgets" as Widgets
 
 Item {
 	id: titlebar
@@ -21,7 +22,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
         }
         
-        Text {
+        Widgets.NativeText {
             text: "抢票助手"
             anchors.verticalCenter: parent.verticalCenter
             color: "#fff"

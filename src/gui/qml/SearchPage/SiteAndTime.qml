@@ -1,4 +1,5 @@
 import QtQuick 2.1
+import "../Widgets" as Widgets
 
 Row {
     spacing: 5
@@ -8,12 +9,12 @@ Row {
     property alias font: timer.font
     property alias color: timer.color
     
-    Text {
+    Widgets.NativeText {
         id: timer
         text: "00:15"
     }
     
-    Text {
+    Widgets.NativeText {
         text: " - "
     }
     
@@ -32,14 +33,14 @@ Row {
         color: getCrossColor()
         radius: 3
         
-        Text {
+        Widgets.NativeText {
             id: cross
             text: "过"
             color: "#fff"
             anchors.centerIn: parent
         }
     }
-    Text {
+    Widgets.NativeText {
         id: site
         text: "武昌"
     }

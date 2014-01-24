@@ -20,7 +20,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             model: Poster.selectPassengerModel()
             delegate: Component {
-                Text {
+                Widgets.NativeText {
                     anchors.rightMargin: 8
                     anchors.verticalCenter: displayRepeater.verticalCenter
                     text: instance.passengerName
@@ -84,7 +84,7 @@ Item {
                 onClicked: Poster.requestPassengers()
             }
             
-            Text {
+            Widgets.NativeText {
                 id: titleText
                 text: "选择乘车人(最多5人)"
                 font.pixelSize: 14

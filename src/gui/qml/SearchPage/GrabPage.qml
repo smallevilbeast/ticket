@@ -20,7 +20,7 @@ Item {
         spacing: 20
         visible: false
         
-        Text {
+        Widgets.NativeText {
             text: "恭喜你抢票成功!, 请稍后登录12306查询订单"
             font.pixelSize: 16
         }
@@ -44,18 +44,18 @@ Item {
         visible: !codeVisible
         anchors.centerIn: parent        
         
-        Text {
+        Widgets.NativeText {
             text: "正在刷票..."
             font.pixelSize: 14
             font.weight: Font.Bold
         }
         
         Row {
-            Text { text: "已尝试 "; anchors.verticalCenter: parent.verticalCenter }
-            Text { text: Poster.queryNumber; color: "#FDA231"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter  }
-            Text { text: " 次, "; anchors.verticalCenter: parent.verticalCenter }
-            Text { text: Poster.queryRemainingTime; color: "#FDA231"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter  }
-            Text { text: " 秒后继续尝试"; anchors.verticalCenter: parent.verticalCenter }
+            Widgets.NativeText { text: "已尝试 "; anchors.verticalCenter: parent.verticalCenter }
+            Widgets.NativeText { text: Poster.queryNumber; color: "#FDA231"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter  }
+            Widgets.NativeText { text: " 次, "; anchors.verticalCenter: parent.verticalCenter }
+            Widgets.NativeText { text: Poster.queryRemainingTime; color: "#FDA231"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter  }
+            Widgets.NativeText { text: " 秒后继续尝试"; anchors.verticalCenter: parent.verticalCenter }
         }
         
         Widgets.Button {

@@ -13,7 +13,7 @@ Column {
         Column {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 5
-            Text {
+            Widgets.NativeText {
                 /* anchors.horizontalCenter: parent.horizontalCenter */
                 text: "出发站"
                 color: "#333333"
@@ -47,7 +47,7 @@ Column {
         Column {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 5
-            Text {
+            Widgets.NativeText {
                 /* anchors.horizontalCenter: parent.horizontalCenter             */
                 text: "目的站"
                 font.pixelSize: 14
@@ -65,14 +65,14 @@ Column {
     
     Row {
         spacing: 10
-        Text { text: "乘车日期"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
+        Widgets.NativeText { text: "乘车日期"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
         Widgets.Calendar { id: calendar; anchors.verticalCenter: parent.verticalCenter; width: 182}
     }
     
     
     
     Row {
-        Text { text: "选择乘客"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
+        Widgets.NativeText { text: "选择乘客"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
         PassengerView {
             width: 250
         }
@@ -81,7 +81,7 @@ Column {
     }
         
     Row {
-        Text { text: "期望车次"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
+        Widgets.NativeText { text: "期望车次"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
         TrainView {
             width: 250
             enabled: fromStation.telecode && toStation.telecode && calendar.text
@@ -95,7 +95,7 @@ Column {
     
 
     Row {
-        Text { text: "期望席别"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
+        Widgets.NativeText { text: "期望席别"; color: "#333333"; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 14 }
         SeatView {
             width: 250
         }

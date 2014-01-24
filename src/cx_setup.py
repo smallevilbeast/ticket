@@ -42,8 +42,8 @@ setup(
                                         "PyQt5.QtNetwork","PyQt5.QtOpenGL", "PyQt5.QtQml", "PyQt5.QtQuick"],
                            "include_files": include_files,
                            "excludes" : ['Tkinter'],
-                           "optimize" : 2,
-                           "compressed" : True,
+                           # "optimize" : 2,
+                           # "compressed" : True,
                            "include_msvcr" : True,
                        }},
     executables=[
