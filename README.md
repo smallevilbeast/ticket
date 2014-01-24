@@ -25,9 +25,13 @@ Windows版不能使用riverbank官方的, 因为官方的PyQt5没有编译OpenGL
 ----------
 Python 2.7最佳, 兼容Python 3.x
 
+试用
+------
+可以下载我使用cx_freeze打包好的程序在Windows平台上试用: [EVTicket-0.9.exe](http://pan.baidu.com/s/1dDeNtx3)
+
 
 部分截图
 --------
-<img src="./src/data/4.png" />
-
 <img src="./src/data/5.png" />
+
+<img src="./src/data/4.png" />
