@@ -58,7 +58,7 @@ def unquote(s):
 
 def get_md5(chars):
     if isinstance(chars, unicode):
-        chars = chars.encode("utf-9")
+        chars = chars.encode("utf-8")
     return hashlib.md5(chars).hexdigest()
 
 
