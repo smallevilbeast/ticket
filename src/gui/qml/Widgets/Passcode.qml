@@ -56,7 +56,7 @@ Rectangle {
             spacing: 10
                 
             NativeText {
-                text: "因12306屏蔽工具, 您需要手动输入"
+                text: "因为12306屏蔽工具, 您需要手动输入"
                 color: "#39a954"
             }
                 

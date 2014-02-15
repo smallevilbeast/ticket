@@ -28,7 +28,7 @@ Python 2.7最佳, 兼容Python 3.x
 
 试用
 ------
-可以下载我使用cx_freeze打包好的程序在Windows平台上试用: [EVTicket-0.9.exe](http://pan.baidu.com/s/1dDeNtx3)
+可以下载我使用cx_freeze打包好的程序在Windows平台上试用: [EVTicket-0.9.exe](http://pan.baidu.com/s/1qWjQ8US#dir/path=%2FTicket)
 
 
 部分截图
