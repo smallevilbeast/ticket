@@ -15,7 +15,7 @@ from gui import signals as guiSignals
 from core.signals import query_trains_completed, query_tickets_completed
 from core.poster import SEAT_TYPE, JSON_SEAT, poster
 from db import signals as dbSignals
-from db.models import common_db, user_db, Station, Passenger, UserHistory
+from db.models import common_db, user_db, Station, Passenger, UserHistory, user_db_is_inited
 
 def peeweeWrapper(instance):
     params = instance.__dict__['_data']
@@ -249,22 +249,31 @@ class PassengerModel(BaseModel):
     def __init__(self, parent=None, connectSignals=True):
         super(PassengerModel, self).__init__(parent)
         if connectSignals:
-            dbSignals.db_init_finished.connect(self.onDBInitFinished, sender=user_db)
+            if user_db_is_inited():
+                self.addAllPassengers()
+            else:    
+                dbSignals.db_init_finished.connect(self.onDBInitFinished, sender=user_db)
             dbSignals.post_save.connect(self.onPostSave, sender=Passenger)
+            
+        self._updateFlag = False
         
     @postGui()    
     def onDBInitFinished(self, created, *args, **kwargs):
         if not created:
             self.addAllPassengers()
+        else:    
+            self._updateFlag = True
             
     def addAllPassengers(self):        
         query = Passenger.select()
         for item in query:
             self.append(peeweeWrapper(item))
+        self._updateFlag = True            
             
     @postGui()        
     def onPostSave(self, instance, *args, **kwargs):
-        self.append(peeweeWrapper(instance))
+        if self._updateFlag:
+            self.append(peeweeWrapper(instance))
 
 class UserHistoryModel(BaseModel):        
     

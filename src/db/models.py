@@ -26,6 +26,13 @@ user_db = pw.SqliteDatabase(None, check_same_thread=False, threadlocals=True)
 
 VERSION = "1"
 COMMON_DB_INITED = False
+USER_DB_INITED = False
+
+def user_db_is_inited():
+    return USER_DB_INITED
+
+def common_db_is_inited():
+    return COMMON_DB_INITED
 
 @contextmanager
 def disable_auto_commit(db):
@@ -151,6 +158,7 @@ def _init_common_db():
 @receiver(core_signals.login_successed)
 @common.threaded
 def _init_user_db(sender, username, *args, **kwargs):
+    global USER_DB_INITED
     db_file = xdg.get_user_file(username, "dat_{0}.db".format(VERSION))
     user_db.init(db_file)
     created = False
@@ -160,6 +168,7 @@ def _init_user_db(sender, username, *args, **kwargs):
         poster.request_passengers()
         created = True
     signals.db_init_finished.send(sender=user_db, created=created)    
+    USER_DB_INITED = True
     
 @receiver(core_signals.passengers_received)    
 def _update_passengers(sender, passengers, *args, **kwargs):

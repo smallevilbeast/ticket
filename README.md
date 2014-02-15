@@ -14,7 +14,8 @@ easy_install requests
 
 关于PyQt5
 ---------
-Linux, Mac可以从[iverbankcomputing](http://www.riverbankcomputing.com/software/pyqt/download5)下载
+Linux, Mac可以从[iverbankcomputing](http://www.riverbankcomputing.com/software/pyqt/download5)下载.
+
 Windows版不能使用riverbank官方的, 因为官方的PyQt5没有编译OpenGL, 可以下载我自己编译的版本[PyQt5-5.2-gpl-Py2.7-Qt5.2.0-x32.exe](http://pan.baidu.com/s/1dDDZiHr)
 
 跨平台
