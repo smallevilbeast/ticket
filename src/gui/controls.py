@@ -164,6 +164,7 @@ class PosterControl(QPropertyObject()):
         )
         MonitorHistory.create(**params)
         
+    @postGui()    
     def onQueryTicketsCompleted(self, data, *args, **kwargs):    
         if data is None:
             self._queryTimer.start()
