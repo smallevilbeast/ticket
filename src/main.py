@@ -4,8 +4,9 @@
 import sys
 
 if sys.platform == "win32" and hasattr(sys, "frozen"):
-    reload(sys)
-    sys.setdefaultencoding('gbk')
+    if hasattr(sys, "setdefaultencoding"):
+        reload(sys)
+        sys.setdefaultencoding('gbk')
 
 import os
 from PyQt5 import QtCore
@@ -18,7 +19,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 import logging
 logging.basicConfig(level=logging.INFO) # change to 'DEBUG' to see more
 
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets
 import gui.resource_rc
 from gui.instance import Instance
 
@@ -28,10 +29,11 @@ if __name__ == "__main__":
     import db
     db.models.init_db()
     app = QtWidgets.QApplication(sys.argv)
-    font = QtGui.QFont()
+    # font = QtGui.QFont()
+    font = app.font()
     # allFamillies = QtGui.QFontDatabase().families()    
     # font.setFamily(font.defaultFamily())
-    font.setFamily(font.family())
+    # font.setFamily(font.family())
     font.setPixelSize(12)
     app.setFont(font)
     win = Instance()

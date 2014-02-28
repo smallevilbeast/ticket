@@ -134,7 +134,7 @@ class TrainModel(BaseModel):
     @classmethod
     def parseLishiValue(self, value):
         value = int(value)
-        x = value / 60
+        x = int(value / 60)
         mod = value % 60
         if x < 1:
             return "{0:0>2}分钟".format(value)

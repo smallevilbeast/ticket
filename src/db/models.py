@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from utils import xdg
 from utils import common
 from utils import peewee as pw
+from utils.six import text_type
 from db.base import Model
 from db import signals
 from core import signals as core_signals
@@ -130,8 +131,8 @@ def create_user_tables():
     
 def insert_station_data():    
     f = xdg.get_data_file("station_names.txt")
-    with open(f) as fp:
-        content = fp.read().decode("utf-8").strip("\n")
+    with open(f, 'rb') as fp:
+        content = text_type(fp.read(), 'utf-8').strip("\n")
         lines = content.split("@")
         with disable_auto_commit(common_db):
             for line in lines:

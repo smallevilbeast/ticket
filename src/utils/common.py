@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib
 import time
 import random
 import string
@@ -17,6 +16,7 @@ except ImportError:
     import json
     
 from utils.six.moves import xrange
+from utils.six import text_type
     
 def parse_json(raw):
     try:
@@ -46,18 +46,8 @@ def radix(n, base=36):
 def timechecksum():
     return radix(timestamp())
 
-def quote(s):
-    if isinstance(s, unicode):
-        s = s.encode("gbk")
-    else:    
-        s = unicode(s, "utf-8").encode("gbk")
-    return urllib.quote(s)    
-
-def unquote(s):
-    return urllib.unquote(s)
-
 def get_md5(chars):
-    if isinstance(chars, unicode):
+    if isinstance(chars, text_type):
         chars = chars.encode("utf-8")
     return hashlib.md5(chars).hexdigest()
 

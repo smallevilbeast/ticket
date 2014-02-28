@@ -295,7 +295,7 @@ class Poster(object):
     def submit_order_request(self, train):        
         url = "https://kyfw.12306.cn/otn/leftTicket/submitOrderRequest"
         data = OrderedDict()
-        data['secretStr'] = unquote(train.secretStr.encode("utf-8"))
+        data['secretStr'] = unquote(train.secretStr)
         data['train_date'] = train.startTrainDate 
         data['back_train_date'] = train.startTrainDate
         data['tour_flag'] = "dc"
