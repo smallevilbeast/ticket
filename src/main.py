@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import sys
 
 if sys.platform == "win32" and hasattr(sys, "frozen"):
@@ -19,9 +21,17 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 import logging
 logging.basicConfig(level=logging.INFO) # change to 'DEBUG' to see more
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 import gui.resource_rc
 from gui.instance import Instance
+
+def setFontFamily(font):
+    allFamillies = QtGui.QFontDatabase().families()
+    familyName = font.defaultFamily()  
+    if "微软雅黑" in allFamillies:
+        familyName = "微软雅黑"
+    font.setFamily(familyName)
+
 
 
 if __name__ == "__main__":
@@ -29,11 +39,8 @@ if __name__ == "__main__":
     import db
     db.models.init_db()
     app = QtWidgets.QApplication(sys.argv)
-    # font = QtGui.QFont()
-    font = app.font()
-    # allFamillies = QtGui.QFontDatabase().families()    
-    # font.setFamily(font.defaultFamily())
-    # font.setFamily(font.family())
+    font = QtGui.QFont()
+    setFontFamily(font)
     font.setPixelSize(12)
     app.setFont(font)
     win = Instance()
